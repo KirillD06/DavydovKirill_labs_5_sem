@@ -8,4 +8,4 @@
 
 ## Ветки
 
-- `lab1-templating` — ЛР 1 (дизайн в Figma, серверная шаблонизация NestJS + Handlebars, хранение медиа в MinIO)
+- `lab1-design-templating` — ЛР 1 (дизайн в Figma, серверная шаблонизация NestJS + Handlebars, хранение медиа в MinIO)
