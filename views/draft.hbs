@@ -1,0 +1,45 @@
+{{> head}}
+  <div class="page">
+    <h2 class="page-title">Добавление грунта</h2>
+
+    <form class="form">
+      <div class="field">
+        <label class="field-label">Изображение</label>
+        <div class="media-box">
+          <img class="media-preview" src="{{mediaUrl}}/{{soil.imageName}}" alt="{{soil.name}}">
+          <span class="fake-file">Выбрать файл</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Видео</label>
+        <div class="media-box media-box-empty">
+          <span class="fake-file">{{soil.videoName}} · Выбрать файл</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="name">Название</label>
+        <input class="input" id="name" type="text" value="{{soil.name}}">
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="description">Краткое описание</label>
+        <textarea class="input textarea" id="description" rows="3">{{soil.shortDescription}}</textarea>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="field-label" for="loosening">К разрыхления</label>
+          <input class="input" id="loosening" type="text" value="{{num2 soil.looseningFactor}}">
+        </div>
+        <div class="field">
+          <label class="field-label" for="slope">Заложение откоса</label>
+          <input class="input" id="slope" type="text" value="{{num2 soil.slopeRatio}}">
+        </div>
+      </div>
+
+      <button class="btn" type="button">Опубликовать</button>
+    </form>
+  </div>
+{{> tabbar}}
