@@ -1,17 +1,17 @@
 {{> head}}
-  {{#if soil}}
+  {{#if soilType}}
     <div class="feed">
-      <video class="feed-video" src="{{mediaUrl}}/{{soil.videoName}}"
-             poster="{{mediaUrl}}/{{soil.imageName}}"
+      <video class="feed-video" src="{{mediaUrl}}/{{soilType.videoName}}"
+             poster="{{mediaUrl}}/{{soilType.imageName}}"
              autoplay muted loop playsinline preload="auto"></video>
       <div class="feed-shade"></div>
 
       <div class="feed-body">
-        <h1 class="feed-name">{{soil.name}}</h1>
-        <p class="feed-short">{{soil.shortDescription}}</p>
+        <h1 class="feed-name">{{soilType.name}}</h1>
+        <p class="feed-short">{{soilType.shortDescription}}</p>
         <details class="feed-details">
-          <summary>Подробнее</summary>
-          <p class="feed-full">{{soil.fullDescription}}</p>
+          <summary>Ещё</summary>
+          <p class="feed-full">{{soilType.fullDescription}}</p>
         </details>
       </div>
 
@@ -20,16 +20,31 @@
           <svg class="heart" viewBox="0 0 24 24">
             <path d="M12 21c-.3 0-.6-.1-.8-.3C7.3 17.4 4 14.3 4 10.6 4 7.9 6 6 8.4 6c1.4 0 2.7.7 3.6 1.8C12.9 6.7 14.2 6 15.6 6 18 6 20 7.9 20 10.6c0 3.7-3.3 6.8-7.2 10.1-.2.2-.5.3-.8.3z"/>
           </svg>
-          <span class="feed-like-count">{{soil.likes.length}}</span>
+          <span class="feed-like-count">{{soilType.likesCount}}</span>
         </div>
 
-        <span class="chip">Откос {{num2 soil.slopeRatio}}</span>
-        <span class="chip">K разрыхления {{num2 soil.looseningFactor}}</span>
+        <div class="feed-param">
+          <svg class="param-icon" viewBox="0 0 24 24">
+            <path d="M4 18h16M7 18V9M12 18V5M17 18v-6"/>
+          </svg>
+          <span class="param-value">{{num2 soilType.looseningFactor}}</span>
+        </div>
 
-        <a class="btn feed-next" href="/soils/feed/{{soil.id}}?next=true">Следующий</a>
+        <div class="feed-param">
+          <svg class="param-icon" viewBox="0 0 24 24">
+            <path d="M12 3v18M6 9l6-6 6 6M6 15l6 6 6-6"/>
+          </svg>
+          <span class="param-value">{{num2 soilType.density}}</span>
+        </div>
+
+        <a class="feed-next" href="/soil_types/feed/{{soilType.id}}?next=true" aria-label="Следующий">
+          <svg viewBox="0 0 24 24">
+            <path d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
       </div>
     </div>
   {{else}}
-    <p class="empty">Грунт не найден</p>
+    <p class="empty">Тип грунта не найден</p>
   {{/if}}
 {{> tabbar}}

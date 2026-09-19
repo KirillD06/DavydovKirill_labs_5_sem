@@ -1,4 +1,4 @@
-export interface Soil {
+export interface SoilType {
   id: number;
   name: string;
   shortDescription: string;
@@ -6,15 +6,14 @@ export interface Soil {
   imageName: string;
   videoName: string;
   looseningFactor: number;
-  residualFactor: number;
-  slopeRatio: number;
+  density: number;
   status: 'published' | 'draft' | 'deleted';
   likes: number[];
 }
 
-export const MEDIA_URL = 'http://localhost:9000/soils';
+export const MEDIA_URL = 'http://localhost:9000/soil-types';
 
-export const SOILS: Soil[] = [
+export const SOIL_TYPES: SoilType[] = [
   {
     id: 1,
     name: 'Песок',
@@ -25,8 +24,7 @@ export const SOILS: Soil[] = [
     imageName: 'sand.jpg',
     videoName: 'sand.mp4',
     looseningFactor: 1.12,
-    residualFactor: 1.03,
-    slopeRatio: 1.0,
+    density: 1.65,
     status: 'published',
     likes: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   },
@@ -40,8 +38,7 @@ export const SOILS: Soil[] = [
     imageName: 'sandy-loam.jpg',
     videoName: 'sandy-loam.mp4',
     looseningFactor: 1.15,
-    residualFactor: 1.04,
-    slopeRatio: 0.67,
+    density: 1.7,
     status: 'published',
     likes: [2, 4, 6, 8, 10, 12, 14],
   },
@@ -55,8 +52,7 @@ export const SOILS: Soil[] = [
     imageName: 'loam.jpg',
     videoName: 'loam.mp4',
     looseningFactor: 1.22,
-    residualFactor: 1.05,
-    slopeRatio: 0.5,
+    density: 1.75,
     status: 'published',
     likes: [1, 3, 5, 7, 9, 11, 13, 15, 17],
   },
@@ -70,8 +66,7 @@ export const SOILS: Soil[] = [
     imageName: 'gravel.jpg',
     videoName: 'gravel.mp4',
     looseningFactor: 1.18,
-    residualFactor: 1.06,
-    slopeRatio: 0.75,
+    density: 1.95,
     status: 'published',
     likes: [3, 6, 9, 12, 15, 18, 21, 24, 27, 30],
   },
@@ -85,8 +80,7 @@ export const SOILS: Soil[] = [
     imageName: 'rock.jpg',
     videoName: 'rock.mp4',
     looseningFactor: 1.48,
-    residualFactor: 1.2,
-    slopeRatio: 0.1,
+    density: 2.4,
     status: 'published',
     likes: [5, 10, 15, 20, 25, 30],
   },
@@ -100,8 +94,7 @@ export const SOILS: Soil[] = [
     imageName: 'clay.jpg',
     videoName: 'clay.mp4',
     looseningFactor: 1.28,
-    residualFactor: 1.07,
-    slopeRatio: 0.25,
+    density: 1.8,
     status: 'draft',
     likes: [7, 14, 21, 28],
   },
@@ -115,8 +108,7 @@ export const SOILS: Soil[] = [
     imageName: 'loess.jpg',
     videoName: 'loess.mp4',
     looseningFactor: 1.2,
-    residualFactor: 1.04,
-    slopeRatio: 0.5,
+    density: 1.6,
     status: 'deleted',
     likes: [11, 22],
   },

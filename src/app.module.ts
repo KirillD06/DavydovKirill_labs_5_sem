@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { SoilsModule } from './soils/soils.module';
+import { SoilTypesModule } from './soil_types/soil_types.module';
 
 @Module({
-  imports: [SoilsModule],
+  imports: [SoilTypesModule],
 })
 export class AppModule {}

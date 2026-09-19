@@ -5,7 +5,7 @@
 }
 
 body {
-  background: #8d8d8d;
+  background: #ededed;
   font-family: Montserrat, Arial, sans-serif;
   color: #222222;
 }
@@ -58,7 +58,7 @@ body {
   display: block;
   padding: 12px 15px;
   background: #fccc41;
-  color: #252525;
+  color: #222222;
   font-family: inherit;
   font-size: 16px;
   font-weight: 700;
@@ -66,14 +66,14 @@ body {
   text-decoration: none;
   border: none;
   border-radius: 5px;
-  box-shadow: 0 0 10px #eaeaea;
+  box-shadow: 0 0 10px #ededed;
   transition: background 0.5s, box-shadow 0.5s;
   cursor: pointer;
 }
 
 .btn:hover {
   background: #ffc008;
-  color: #151515;
+  color: #222222;
   box-shadow: none;
 }
 
@@ -128,21 +128,36 @@ body {
   bottom: 78px;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 14px;
+  align-items: center;
+  gap: 18px;
 }
 
-.chip {
-  white-space: nowrap;
-  padding: 8px 14px;
-  background: #fccc41;
-  color: #222222;
-  font-size: 14px;
+.feed-param {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #ffffff;
+}
+
+.param-icon {
+  width: 30px;
+  height: 30px;
+  fill: none;
+  stroke: #fccc41;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.param-value {
+  font-size: 15px;
   font-weight: 700;
-  border-radius: 5px;
 }
 
 .feed-short {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   font-size: 13px;
   line-height: 1.45;
 }
@@ -185,8 +200,8 @@ body {
 }
 
 .feed-like .heart {
-  width: 38px;
-  height: 38px;
+  width: 30px;
+  height: 30px;
 }
 
 .feed-like-count {
@@ -194,9 +209,37 @@ body {
   font-weight: 700;
 }
 
+.feed-like,
+.feed-param {
+  width: 64px;
+  gap: 2px;
+}
+
 .feed-next {
-  padding: 12px 22px;
-  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: #fccc41;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #ededed;
+  transition: background 0.5s, box-shadow 0.5s;
+}
+
+.feed-next:hover {
+  background: #ffc008;
+  box-shadow: none;
+}
+
+.feed-next svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: #222222;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .page {
@@ -206,7 +249,7 @@ body {
 .page-title {
   font-size: 22px;
   font-weight: 900;
-  color: #212529;
+  color: #222222;
   text-align: center;
   margin-bottom: 14px;
 }
@@ -226,13 +269,27 @@ body {
   text-align: center;
 }
 
-.filter-row {
+.range {
   display: flex;
-  gap: 8px;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
-.filter-row .input {
+.range-value {
+  min-width: 42px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.range-input {
   flex: 1;
+  accent-color: #fccc41;
+}
+
+.filter .btn {
+  width: 100%;
+  margin-top: 4px;
 }
 
 .input {
@@ -240,11 +297,11 @@ body {
   text-align: center;
   padding: 10px;
   background: #ffffff;
-  border: 1px solid #d8d8d8;
+  border: 1px solid #ededed;
   border-radius: 5px;
   font-family: inherit;
   font-size: 13px;
-  color: #555555;
+  color: #222222;
 }
 
 .textarea {
@@ -261,7 +318,7 @@ body {
 .card {
   display: block;
   background: #ededed;
-  box-shadow: 0 0 10px #d2d2d2;
+  box-shadow: 0 0 10px #ededed;
   text-decoration: none;
   color: inherit;
   overflow: hidden;
@@ -291,7 +348,7 @@ body {
 .card-factor {
   margin-top: 3px;
   font-size: 11px;
-  color: #666666;
+  color: #222222;
 }
 
 .card-likes {
@@ -317,15 +374,6 @@ body {
   font-size: 12px;
   font-weight: 700;
   text-align: center;
-}
-
-.field-row {
-  display: flex;
-  gap: 10px;
-}
-
-.field-row .field {
-  flex: 1;
 }
 
 .form .btn {
@@ -357,14 +405,14 @@ body {
 .fake-file {
   padding: 7px 10px;
   background: #ffffff;
-  border: 1px solid #d8d8d8;
+  border: 1px solid #ededed;
   border-radius: 5px;
   font-size: 12px;
-  color: #555555;
+  color: #222222;
 }
 
 .empty {
   padding: 30px 14px;
   text-align: center;
-  color: #666666;
+  color: #222222;
 }
