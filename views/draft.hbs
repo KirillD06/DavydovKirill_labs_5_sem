@@ -2,42 +2,76 @@
   <div class="page">
     <h2 class="page-title">Добавление типа грунта</h2>
 
-    <form class="form">
-      <div class="field">
-        <label class="field-label">Изображение</label>
-        <div class="media-box">
-          <img class="media-preview" src="{{mediaUrl}}/{{soilType.imageName}}" alt="{{soilType.name}}">
-          <span class="fake-file">{{soilType.imageName}} · Выбрать файл</span>
+    {{#if soilType}}
+      <form class="form" method="post" action="/soil_types/publish">
+        <input type="hidden" name="id" value="{{soilType.id}}">
+
+        <div class="field">
+          <label class="field-label">Изображение</label>
+          <div class="media-box">
+            <img class="media-preview" src="{{soilType.imageUrl}}" alt="{{soilType.name}}">
+            <span class="fake-file">Выбрать файл</span>
+          </div>
         </div>
-      </div>
 
-      <div class="field">
-        <label class="field-label">Видео</label>
-        <div class="media-box">
-          <img class="media-preview" src="{{mediaUrl}}/{{soilType.imageName}}" alt="{{soilType.name}}">
-          <span class="fake-file">{{soilType.videoName}} · Выбрать файл</span>
+        <div class="field">
+          <label class="field-label">Видео</label>
+          <div class="media-box">
+            <img class="media-preview" src="{{soilType.imageUrl}}" alt="{{soilType.name}}">
+            <span class="fake-file">Выбрать файл</span>
+          </div>
         </div>
-      </div>
 
-      <div class="field">
-        <label class="field-label" for="name">Название</label>
-        <input class="input" id="name" type="text" value="{{soilType.name}}">
-      </div>
+        <div class="field">
+          <label class="field-label" for="name">Название</label>
+          <input class="input" id="name" type="text" value="{{soilType.name}}" readonly>
+        </div>
 
-      <div class="field">
-        <label class="field-label" for="description">Краткое описание</label>
-        <textarea class="input textarea" id="description" rows="3">{{soilType.shortDescription}}</textarea>
-      </div>
+        <div class="field">
+          <label class="field-label" for="shortDescription">Краткое описание</label>
+          <textarea class="input textarea" id="shortDescription" name="shortDescription"
+                    rows="3">{{soilType.shortDescription}}</textarea>
+        </div>
 
-      <div class="field">
-        <label class="field-label" for="loosening">Коэффициент разрыхления</label>
-        <input class="input" id="loosening" type="text" value="{{num2 soilType.looseningFactor}}">
-      </div>
+        <div class="field">
+          <label class="field-label" for="looseningFactor">Коэффициент разрыхления</label>
+          <input class="input" id="looseningFactor" name="looseningFactor" type="text"
+                 value="{{num2 soilType.looseningFactor}}">
+        </div>
 
-      <div class="field">
-        <label class="field-label" for="density">Плотность, т/м³</label>
-        <input class="input" id="density" type="text" value="{{num2 soilType.density}}">
-      </div>
-    </form>
+        <div class="field">
+          <label class="field-label" for="density">Плотность, т/м³</label>
+          <input class="input" id="density" name="density" type="text"
+                 value="{{num2 soilType.density}}">
+        </div>
+
+        <button class="btn" type="submit">Опубликовать</button>
+      </form>
+    {{else}}
+      <form class="form" method="post" action="/soil_types/create">
+        <div class="field">
+          <label class="field-label">Изображение</label>
+          <div class="media-box">
+            <img class="media-preview" src="/default.jpg" alt="Изображение по умолчанию">
+            <span class="fake-file">Выбрать файл</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Видео</label>
+          <div class="media-box">
+            <img class="media-preview" src="/default.jpg" alt="Видео по умолчанию">
+            <span class="fake-file">Выбрать файл</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="name">Название</label>
+          <input class="input" id="name" name="name" type="text" placeholder="Например, Торф">
+        </div>
+
+        <button class="btn" type="submit">Далее</button>
+      </form>
+    {{/if}}
   </div>
 {{> tabbar}}

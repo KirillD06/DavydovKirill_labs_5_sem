@@ -10,8 +10,12 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
   hbs.registerPartials(join(__dirname, '..', 'views', 'partials'));
-  hbs.registerHelper('num2', (value: number) => value.toFixed(2).replace('.', ','));
+  hbs.registerHelper('num2', (value: number | string) =>
+    Number(value).toFixed(2).replace('.', ','),
+  );
   app.setViewEngine('hbs');
+
+  app.use(require('express').urlencoded({ extended: true }));
 
   await app.listen(3000);
 }

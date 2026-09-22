@@ -1,8 +1,8 @@
 {{> head}}
   {{#if soilType}}
     <div class="feed">
-      <video class="feed-video" src="{{mediaUrl}}/{{soilType.videoName}}"
-             poster="{{mediaUrl}}/{{soilType.imageName}}"
+      <video class="feed-video" src="{{soilType.videoUrl}}"
+             poster="{{soilType.imageUrl}}"
              autoplay muted loop playsinline preload="auto"></video>
       <div class="feed-shade"></div>
 

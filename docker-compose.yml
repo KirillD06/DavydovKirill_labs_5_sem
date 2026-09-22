@@ -17,6 +17,11 @@ services:
       POSTGRES_USER: root
       POSTGRES_DB: RIP
       POSTGRES_PASSWORD: root
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8081:8080"
   minio:
     container_name: minio
     image: minio/minio:latest

@@ -315,6 +315,22 @@ body {
   gap: 12px;
 }
 
+.card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.card-delete {
+  padding: 0 9px 9px;
+}
+
+.card-delete .btn {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 13px;
+}
+
 .card {
   display: block;
   background: #ededed;

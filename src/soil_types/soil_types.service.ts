@@ -1,38 +1,117 @@
 import { Injectable } from '@nestjs/common';
-import { SoilType, SOIL_TYPES } from './soil_types.data';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository, SelectQueryBuilder } from 'typeorm';
+import { SoilType } from '../entities/soil-type.entity';
+
+export const CURRENT_USER_ID = 1;
 
 @Injectable()
 export class SoilTypesService {
-  private readonly soilTypes: SoilType[] = SOIL_TYPES;
+  constructor(
+    @InjectRepository(SoilType)
+    private readonly soilTypeRepository: Repository<SoilType>,
+  ) {}
 
-  findPublished(maxLoosening?: number): SoilType[] {
-    const published = this.soilTypes.filter((soilType) => soilType.status === 'published');
-
-    if (maxLoosening === undefined) {
-      return published;
-    }
-
-    return published.filter((soilType) => soilType.looseningFactor <= maxLoosening);
+  private withLikesCount() {
+    return this.soilTypeRepository
+      .createQueryBuilder('soilType')
+      .addSelect(
+        `(SELECT COUNT(*) FROM likes WHERE likes."soilTypeId" = soilType.id)`,
+        'likesCount',
+      );
   }
 
-  findById(id: number): SoilType | undefined {
-    return this.soilTypes.find(
-      (soilType) => soilType.id === id && soilType.status !== 'deleted',
+  private async fetchAll(query: SelectQueryBuilder<SoilType>): Promise<SoilType[]> {
+    const { entities, raw } = await query.getRawAndEntities();
+
+    return entities.map((soilType, index) => {
+      soilType.likesCount = Number(raw[index].likesCount);
+
+      return soilType;
+    });
+  }
+
+  private async fetchOne(query: SelectQueryBuilder<SoilType>): Promise<SoilType | null> {
+    const [soilType] = await this.fetchAll(query.limit(1));
+
+    return soilType ?? null;
+  }
+
+  async findPublished(maxLoosening?: number): Promise<SoilType[]> {
+    const query = this.withLikesCount()
+      .where('soilType.status = :status', { status: 'published' })
+      .orderBy('soilType.id', 'ASC');
+
+    if (maxLoosening !== undefined) {
+      query.andWhere('soilType.looseningFactor <= :maxLoosening', { maxLoosening });
+    }
+
+    return this.fetchAll(query);
+  }
+
+  async findById(id: number): Promise<SoilType | null> {
+    return this.fetchOne(
+      this.withLikesCount()
+        .where('soilType.id = :id', { id })
+        .andWhere('soilType.status != :deleted', { deleted: 'deleted' }),
     );
   }
 
-  findNext(id: number): SoilType | undefined {
-    const published = this.findPublished();
-    const current = published.findIndex((soilType) => soilType.id === id);
-
-    return published[(current + 1) % published.length];
+  async findFirst(): Promise<SoilType | null> {
+    return this.fetchOne(
+      this.withLikesCount()
+        .where('soilType.status = :status', { status: 'published' })
+        .orderBy('soilType.id', 'ASC'),
+    );
   }
 
-  findDraft(): SoilType | undefined {
-    return this.soilTypes.find((soilType) => soilType.status === 'draft');
+  async findNext(id: number): Promise<SoilType | null> {
+    const next = await this.fetchOne(
+      this.withLikesCount()
+        .where('soilType.status = :status', { status: 'published' })
+        .andWhere('soilType.id > :id', { id })
+        .orderBy('soilType.id', 'ASC'),
+    );
+
+    return next ?? this.findFirst();
   }
 
-  countLikes(soilType: SoilType): number {
-    return soilType.likes.length;
+  async findDraft(): Promise<SoilType | null> {
+    return this.fetchOne(
+      this.withLikesCount()
+        .where('soilType.status = :status', { status: 'draft' })
+        .andWhere('soilType.creatorId = :creatorId', { creatorId: CURRENT_USER_ID }),
+    );
+  }
+
+  async createDraft(name: string, imageUrl: string, videoUrl: string): Promise<SoilType> {
+    const draft = this.soilTypeRepository.create({
+      name,
+      imageUrl,
+      videoUrl,
+      status: 'draft',
+      creatorId: CURRENT_USER_ID,
+    });
+
+    return this.soilTypeRepository.save(draft);
+  }
+
+  async publish(
+    id: number,
+    shortDescription: string,
+    looseningFactor: number,
+    density: number,
+  ): Promise<void> {
+    await this.soilTypeRepository.update(
+      { id },
+      { shortDescription, looseningFactor, density, status: 'published', formedAt: new Date() },
+    );
+  }
+
+  async softDelete(id: number): Promise<void> {
+    await this.soilTypeRepository.query(
+      `UPDATE soil_types SET status = 'deleted' WHERE id = $1`,
+      [id],
+    );
   }
 }
