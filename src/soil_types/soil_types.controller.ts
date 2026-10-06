@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post, Query, Redirect, Render } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Redirect, Render, Res } from '@nestjs/common';
+import type { Response } from 'express';
 import { SoilType } from '../entities/soil-type.entity';
 import { SoilTypesService } from './soil_types.service';
 
@@ -48,14 +49,17 @@ export class SoilTypesController {
   }
 
   @Get('feed/:id')
-  @Render('feed')
-  async feed(@Param('id') id: string, @Query('next') next?: string) {
+  async feed(@Param('id') id: string, @Query('next') next: string, @Res() res: Response) {
     const soilType =
       next === 'true'
         ? await this.soilTypesService.findNext(Number(id))
         : await this.soilTypesService.findById(Number(id));
 
-    return this.buildFeed(soilType);
+    if (!soilType) {
+      return res.redirect('/soil_types');
+    }
+
+    return res.render('feed', this.buildFeed(soilType));
   }
 
   @Post('create')
@@ -68,13 +72,13 @@ export class SoilTypesController {
   @Redirect('/soil_types', 302)
   async publish(
     @Body('id') id: string,
-    @Body('shortDescription') shortDescription: string,
+    @Body('description') description: string,
     @Body('looseningFactor') looseningFactor: string,
     @Body('density') density: string,
   ) {
     await this.soilTypesService.publish(
       Number(id),
-      shortDescription ?? '',
+      description ?? '',
       Number(looseningFactor.replace(',', '.')),
       Number(density.replace(',', '.')),
     );

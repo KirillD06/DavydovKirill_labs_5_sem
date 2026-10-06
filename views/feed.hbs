@@ -8,10 +8,12 @@
 
       <div class="feed-body">
         <h1 class="feed-name">{{soilType.name}}</h1>
-        <p class="feed-short">{{soilType.shortDescription}}</p>
         <details class="feed-details">
-          <summary>Ещё</summary>
-          <p class="feed-full">{{soilType.fullDescription}}</p>
+          <summary>
+            <span class="feed-description">{{soilType.description}}</span>
+            <span class="feed-more">Ещё</span>
+            <span class="feed-less">Скрыть</span>
+          </summary>
         </details>
       </div>
 
@@ -45,6 +47,6 @@
       </div>
     </div>
   {{else}}
-    <p class="empty">Тип грунта не найден</p>
+    <p class="empty">Опубликованных типов грунта пока нет</p>
   {{/if}}
 {{> tabbar}}

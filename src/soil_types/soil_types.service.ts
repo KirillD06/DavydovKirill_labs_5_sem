@@ -66,14 +66,13 @@ export class SoilTypesService {
   }
 
   async findNext(id: number): Promise<SoilType | null> {
-    const next = await this.fetchOne(
+    return this.fetchOne(
       this.withLikesCount()
         .where('soilType.status = :status', { status: 'published' })
-        .andWhere('soilType.id > :id', { id })
-        .orderBy('soilType.id', 'ASC'),
+        .orderBy('soilType.id > :id', 'DESC')
+        .addOrderBy('soilType.id', 'ASC')
+        .setParameter('id', id),
     );
-
-    return next ?? this.findFirst();
   }
 
   async findDraft(): Promise<SoilType | null> {
@@ -98,13 +97,13 @@ export class SoilTypesService {
 
   async publish(
     id: number,
-    shortDescription: string,
+    description: string,
     looseningFactor: number,
     density: number,
   ): Promise<void> {
     await this.soilTypeRepository.update(
       { id },
-      { shortDescription, looseningFactor, density, status: 'published', formedAt: new Date() },
+      { description, looseningFactor, density, status: 'published', formedAt: new Date() },
     );
   }
 
