@@ -48,20 +48,20 @@
         <button class="btn" type="submit">Опубликовать</button>
       </form>
     {{else}}
-      <form class="form" method="post" action="/soil_types/create">
+      <form class="form" method="post" action="/soil_types/create" enctype="multipart/form-data">
         <div class="field">
-          <label class="field-label">Изображение</label>
+          <label class="field-label" for="image">Изображение</label>
           <div class="media-box">
             <img class="media-preview" src="/default.jpg" alt="Изображение по умолчанию">
-            <span class="fake-file">Выбрать файл</span>
+            <input class="file-input" id="image" name="image" type="file" accept="image/*">
           </div>
         </div>
 
         <div class="field">
-          <label class="field-label">Видео</label>
+          <label class="field-label" for="video">Видео</label>
           <div class="media-box">
             <img class="media-preview" src="/default.jpg" alt="Видео по умолчанию">
-            <span class="fake-file">Выбрать файл</span>
+            <input class="file-input" id="video" name="video" type="file" accept="video/*">
           </div>
         </div>
 

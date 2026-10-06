@@ -439,6 +439,24 @@ body {
   color: #222222;
 }
 
+.file-input {
+  min-width: 0;
+  font-family: inherit;
+  font-size: 12px;
+  color: #222222;
+}
+
+.file-input::file-selector-button {
+  margin-right: 8px;
+  padding: 7px 10px;
+  background: #ffffff;
+  border: 1px solid #ededed;
+  border-radius: 5px;
+  font: inherit;
+  color: #222222;
+  cursor: pointer;
+}
+
 .empty {
   padding: 30px 14px;
   text-align: center;

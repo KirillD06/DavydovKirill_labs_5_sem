@@ -1,4 +1,17 @@
-import { Body, Controller, Get, Param, Post, Query, Redirect, Render, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  Redirect,
+  Render,
+  Res,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { SoilType } from '../entities/soil-type.entity';
 import { SoilTypesService } from './soil_types.service';
@@ -64,8 +77,17 @@ export class SoilTypesController {
 
   @Post('create')
   @Redirect('/soil_types/draft', 302)
-  async create(@Body('name') name: string) {
-    await this.soilTypesService.createDraft(name ?? '', '', '');
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'image', maxCount: 1 },
+      { name: 'video', maxCount: 1 },
+    ]),
+  )
+  async create(
+    @Body('name') name: string,
+    @UploadedFiles() files: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
+  ) {
+    await this.soilTypesService.createDraft(name ?? '', files?.image?.[0], files?.video?.[0]);
   }
 
   @Post('publish')
