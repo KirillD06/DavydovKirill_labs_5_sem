@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
-import { getCurrentUserId } from '../current-user';
 import { Like } from '../entities/like.entity';
 import { SoilType } from '../entities/soil-type.entity';
 import { MinioService } from '../minio/minio.service';
@@ -21,7 +20,7 @@ export class SoilTypesService {
     private readonly minioService: MinioService,
   ) {}
 
-  private withLikes() {
+  private withLikes(userId?: number) {
     return this.soilTypeRepository
       .createQueryBuilder('soilType')
       .addSelect(
@@ -32,7 +31,7 @@ export class SoilTypesService {
         `(SELECT COUNT(*) FROM likes WHERE likes."soilTypeId" = soilType.id AND likes."userId" = :userId)`,
         'isLiked',
       )
-      .setParameter('userId', getCurrentUserId());
+      .setParameter('userId', userId ?? 0);
   }
 
   private async fetchAll(query: SelectQueryBuilder<SoilType>): Promise<SoilType[]> {
@@ -52,8 +51,8 @@ export class SoilTypesService {
     return soilType ?? null;
   }
 
-  async findPublished(maxLoosening?: number): Promise<SoilType[]> {
-    const query = this.withLikes()
+  async findPublished(maxLoosening?: number, userId?: number): Promise<SoilType[]> {
+    const query = this.withLikes(userId)
       .where('soilType.status = :status', { status: 'published' })
       .orderBy('soilType.id', 'ASC');
 
@@ -64,25 +63,25 @@ export class SoilTypesService {
     return this.fetchAll(query);
   }
 
-  async findById(id: number): Promise<SoilType | null> {
+  async findById(id: number, userId?: number): Promise<SoilType | null> {
     return this.fetchOne(
-      this.withLikes()
+      this.withLikes(userId)
         .where('soilType.id = :id', { id })
         .andWhere('soilType.status = :status', { status: 'published' }),
     );
   }
 
-  async findFirst(): Promise<SoilType | null> {
+  async findFirst(userId?: number): Promise<SoilType | null> {
     return this.fetchOne(
-      this.withLikes()
+      this.withLikes(userId)
         .where('soilType.status = :status', { status: 'published' })
         .orderBy('soilType.id', 'ASC'),
     );
   }
 
-  async findNext(id: number): Promise<SoilType | null> {
+  async findNext(id: number, userId?: number): Promise<SoilType | null> {
     return this.fetchOne(
-      this.withLikes()
+      this.withLikes(userId)
         .where('soilType.status = :status', { status: 'published' })
         .orderBy('soilType.id > :id', 'DESC')
         .addOrderBy('soilType.id', 'ASC')
@@ -90,20 +89,21 @@ export class SoilTypesService {
     );
   }
 
-  async findDraft(): Promise<SoilType | null> {
+  async findDraft(userId: number): Promise<SoilType | null> {
     return this.fetchOne(
-      this.withLikes()
+      this.withLikes(userId)
         .where('soilType.status = :status', { status: 'draft' })
-        .andWhere('soilType.creatorId = :creatorId', { creatorId: getCurrentUserId() }),
+        .andWhere('soilType.creatorId = :creatorId', { creatorId: userId ?? 0 }),
     );
   }
 
   async createDraft(
+    userId: number,
     name: string,
     image?: Express.Multer.File,
     video?: Express.Multer.File,
   ): Promise<SoilType> {
-    if (await this.findDraft()) {
+    if (await this.findDraft(userId)) {
       throw new BadRequestException('У пользователя уже есть черновик');
     }
 
@@ -112,21 +112,22 @@ export class SoilTypesService {
       imageUrl: image ? await this.minioService.upload(image, 'soil-type-image') : '',
       videoUrl: video ? await this.minioService.upload(video, 'soil-type-video') : '',
       status: 'draft',
-      creatorId: getCurrentUserId(),
+      creatorId: userId ?? 0,
     });
 
     await this.soilTypeRepository.save(draft);
 
-    return (await this.findDraft())!;
+    return (await this.findDraft(userId))!;
   }
 
   async publish(
+    userId: number,
     id: number,
     description: string,
     looseningFactor: number,
     density: number,
   ): Promise<SoilType> {
-    const draft = await this.findDraft();
+    const draft = await this.findDraft(userId);
 
     if (!draft || draft.id !== id) {
       throw new NotFoundException('Черновик не найден');
@@ -137,30 +138,30 @@ export class SoilTypesService {
       { description, looseningFactor, density, status: 'published', formedAt: () => 'CURRENT_TIMESTAMP' },
     );
 
-    return (await this.findById(id))!;
+    return (await this.findById(id, userId))!;
   }
 
-  async softDelete(id: number): Promise<void> {
+  async softDelete(id: number, userId: number): Promise<void> {
     const soilType = await this.soilTypeRepository.findOneBy({ id });
 
     if (!soilType || soilType.status === 'deleted') {
       throw new NotFoundException('Тип грунта не найден');
     }
-    if (soilType.creatorId !== getCurrentUserId()) {
+    if (soilType.creatorId !== userId) {
       throw new ForbiddenException('Удалять можно только свои типы грунта');
     }
 
     await this.soilTypeRepository.update({ id }, { status: 'deleted' });
   }
 
-  async setLike(id: number, value: number): Promise<SoilType> {
-    const soilType = await this.findById(id);
+  async setLike(id: number, value: number, userId: number): Promise<SoilType> {
+    const soilType = await this.findById(id, userId);
 
     if (!soilType) {
       throw new NotFoundException('Тип грунта не найден');
     }
 
-    const like = { userId: getCurrentUserId(), soilTypeId: id };
+    const like = { userId: userId ?? 0, soilTypeId: id };
     const exists = await this.likeRepository.existsBy(like);
 
     if (value === 1 && !exists) {
@@ -170,6 +171,6 @@ export class SoilTypesService {
       await this.likeRepository.delete(like);
     }
 
-    return (await this.findById(id))!;
+    return (await this.findById(id, userId))!;
   }
 }

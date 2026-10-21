@@ -1,3 +1,5 @@
+import cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -16,11 +18,18 @@ async function bootstrap() {
   );
   app.setViewEngine('hbs');
 
+  app.use(cookieParser());
+  app.enableShutdownHooks();
   app.use(require('express').urlencoded({ extended: true }));
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
   );
 
-  await app.listen(3000);
+  const config = new DocumentBuilder().setTitle('Типы грунта').setVersion('4.0')
+    .setDescription('10 методов. Далее: name, image, video. Публикация: description, looseningFactor, density. Вход устанавливает HttpOnly cookie; Swagger отправляет её автоматически.')
+    .addCookieAuth('sessionId').build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document, { swaggerOptions: { withCredentials: true, defaultModelsExpandDepth: 0 } });
+  await app.listen(Number(process.env.PORT ?? 3000));
 }
 bootstrap();

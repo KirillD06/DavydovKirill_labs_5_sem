@@ -1,3 +1,6 @@
+import { ApiExcludeController } from '@nestjs/swagger';
+import { RequireUser } from '../session/require-user.decorator';
+import type { UserRequest } from '../session/user-request';
 import {
   Body,
   Controller,
@@ -7,6 +10,7 @@ import {
   Query,
   Redirect,
   Render,
+  Req,
   Res,
   UploadedFiles,
   UseInterceptors,
@@ -22,15 +26,16 @@ export const MAX_LOOSENING = 1.5;
 const DEFAULT_IMAGE = '/default.jpg';
 const DEFAULT_VIDEO = '/default.mp4';
 
+@ApiExcludeController()
 @Controller('soil_types')
 export class SoilTypesController {
   constructor(private readonly soilTypesService: SoilTypesService) {}
 
   @Get()
   @Render('catalog')
-  async catalog(@Query('maxLoosening') maxLoosening?: string) {
+  async catalog(@Req() request: UserRequest, @Query('maxLoosening') maxLoosening?: string) {
     const limit = maxLoosening ? Number(maxLoosening) : MAX_LOOSENING;
-    const soilTypes = await this.soilTypesService.findPublished(limit);
+    const soilTypes = await this.soilTypesService.findPublished(limit, request.currentUser?.id);
 
     return {
       maxLoosening: limit.toFixed(2),
@@ -43,9 +48,10 @@ export class SoilTypesController {
   }
 
   @Get('draft')
+  @RequireUser()
   @Render('draft')
-  async draft() {
-    const soilType = await this.soilTypesService.findDraft();
+  async draft(@Req() request: UserRequest) {
+    const soilType = await this.soilTypesService.findDraft(request.currentUser!.id);
 
     return {
       isDraft: true,
@@ -55,18 +61,18 @@ export class SoilTypesController {
 
   @Get('feed')
   @Render('feed')
-  async feedStart() {
-    const soilType = await this.soilTypesService.findFirst();
+  async feedStart(@Req() request: UserRequest) {
+    const soilType = await this.soilTypesService.findFirst(request.currentUser?.id);
 
     return this.buildFeed(soilType);
   }
 
   @Get('feed/:id')
-  async feed(@Param('id') id: string, @Query('next') next: string, @Res() res: Response) {
+  async feed(@Req() request: UserRequest, @Param('id') id: string, @Query('next') next: string, @Res() res: Response) {
     const soilType =
       next === 'true'
-        ? await this.soilTypesService.findNext(Number(id))
-        : await this.soilTypesService.findById(Number(id));
+        ? await this.soilTypesService.findNext(Number(id), request.currentUser?.id)
+        : await this.soilTypesService.findById(Number(id), request.currentUser?.id);
 
     if (!soilType) {
       return res.redirect('/soil_types');
@@ -76,6 +82,7 @@ export class SoilTypesController {
   }
 
   @Post('create')
+  @RequireUser()
   @Redirect('/soil_types/draft', 302)
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -84,21 +91,25 @@ export class SoilTypesController {
     ]),
   )
   async create(
+    @Req() request: UserRequest,
     @Body('name') name: string,
     @UploadedFiles() files: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
   ) {
-    await this.soilTypesService.createDraft(name ?? '', files?.image?.[0], files?.video?.[0]);
+    await this.soilTypesService.createDraft(request.currentUser!.id, name ?? '', files?.image?.[0], files?.video?.[0]);
   }
 
   @Post('publish')
+  @RequireUser()
   @Redirect('/soil_types', 302)
   async publish(
+    @Req() request: UserRequest,
     @Body('id') id: string,
     @Body('description') description: string,
     @Body('looseningFactor') looseningFactor: string,
     @Body('density') density: string,
   ) {
     await this.soilTypesService.publish(
+      request.currentUser!.id,
       Number(id),
       description ?? '',
       Number(looseningFactor.replace(',', '.')),
@@ -107,9 +118,10 @@ export class SoilTypesController {
   }
 
   @Post('delete')
+  @RequireUser()
   @Redirect('/soil_types', 302)
-  async delete(@Body('id') id: string) {
-    await this.soilTypesService.softDelete(Number(id));
+  async delete(@Req() request: UserRequest, @Body('id') id: string) {
+    await this.soilTypesService.softDelete(Number(id), request.currentUser!.id);
   }
 
   private buildFeed(soilType: SoilType | null) {

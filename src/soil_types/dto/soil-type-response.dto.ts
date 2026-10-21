@@ -1,15 +1,26 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { SoilType } from '../../entities/soil-type.entity';
 
 export class SoilTypeResponseDto {
+  @ApiProperty({})
   id: number;
+  @ApiProperty({})
   name: string;
-  description: string;
+  @ApiProperty({ nullable: true, type: String })
+  description: string | null;
+  @ApiProperty({ nullable: true, type: String })
   imageUrl: string | null;
+  @ApiProperty({ nullable: true, type: String })
   videoUrl: string | null;
+  @ApiProperty({ nullable: true, type: Number })
   looseningFactor: number | null;
+  @ApiProperty({ nullable: true, type: Number })
   density: number | null;
+  @ApiProperty({})
   likesCount: number;
+  @ApiProperty({ enum: [0, 1] })
   isLiked: number;
+  @ApiProperty({ enum: [0, 1] })
   isMine: number;
 
   static fromEntity(soilType: SoilType, currentUserId: number): SoilTypeResponseDto {

@@ -1,0 +1,399 @@
+{
+  "info": {
+    "name": "Типы грунта — ЛР4 готовая проверка",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "10 методов. Сначала выполнить 9. Вход: sessionId сохранится в переменную коллекции. Cookie Jar отключён, доступ переключается галочкой заголовка Cookie. Для кадра переноса cookie из Chrome вставить её значение в переменную sessionId."
+  },
+  "item": [
+    {
+      "name": "9. Вход",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "login"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"user3\",\n  \"password\": \"pass3\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const cookie = pm.response.headers.get(\"Set-Cookie\") || \"\";",
+              "const match = cookie.match(/sessionId=([^;]+)/);",
+              "if (pm.response.code === 200 && match) {",
+              "  pm.collectionVariables.set(\"sessionId\", match[1]);",
+              "}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Список типов грунта с фильтром",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "sessionId={{sessionId}}",
+            "disabled": false
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/soil_types?maxLoosening=1.2",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "soil_types"
+          ],
+          "query": [
+            {
+              "key": "maxLoosening",
+              "value": "1.2"
+            }
+          ]
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      }
+    },
+    {
+      "name": "2. Добавить тип грунта с фото и видео",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "sessionId={{sessionId}}",
+            "disabled": false
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/soil_types",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "soil_types"
+          ]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "name",
+              "value": "Гравий",
+              "type": "text"
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "src": "gravel.jpg"
+            },
+            {
+              "key": "video",
+              "type": "file",
+              "src": "gravel.mp4"
+            }
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code < 300) {",
+              "  pm.collectionVariables.set('soilTypeId', pm.response.json().id);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      }
+    },
+    {
+      "name": "3. Черновик",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "sessionId={{sessionId}}",
+            "disabled": false
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/soil_types/draft",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "soil_types",
+            "draft"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code < 300) {",
+              "  pm.collectionVariables.set('soilTypeId', pm.response.json().id);",
+              "}"
+            ]
+          }
+        }
+      ],
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      }
+    },
+    {
+      "name": "4. Опубликовать черновик",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "sessionId={{sessionId}}",
+            "disabled": false
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/soil_types/{{soilTypeId}}/publish",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "soil_types",
+            "{{soilTypeId}}",
+            "publish"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Плотный связный грунт\",\n  \"looseningFactor\": 1.28,\n  \"density\": 1.8\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      }
+    },
+    {
+      "name": "5. Лента без id",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "sessionId={{sessionId}}",
+            "disabled": false
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/soil_types/feed",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "soil_types",
+            "feed"
+          ],
+          "query": [
+            {
+              "key": "id",
+              "value": "{{soilTypeId}}",
+              "disabled": true
+            },
+            {
+              "key": "next",
+              "value": "true",
+              "disabled": true
+            }
+          ]
+        },
+        "description": "Один GET ленты: без параметров — первый грунт; ?id={{soilTypeId}}&next=true — следующий. Для второго вызова включить параметры id и next."
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      }
+    },
+    {
+      "name": "6. Поставить лайк",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Cookie",
+            "value": "sessionId={{sessionId}}",
+            "disabled": false
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/soil_types/{{soilTypeId}}/like",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "soil_types",
+            "{{soilTypeId}}",
+            "like"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"value\": 1\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      }
+    },
+    {
+      "name": "7. Удалить тип грунта",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Cookie",
+            "value": "sessionId={{sessionId}}",
+            "disabled": false
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/soil_types/{{soilTypeId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "soil_types",
+            "{{soilTypeId}}"
+          ]
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      }
+    },
+    {
+      "name": "8. Регистрация",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/users/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "register"
+          ]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"login\": \"kirill\",\n  \"password\": \"secret1\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      }
+    },
+    {
+      "name": "10. Выход",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/users/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "users",
+            "logout"
+          ]
+        }
+      },
+      "protocolProfileBehavior": {
+        "disableCookies": true
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api"
+    },
+    {
+      "key": "soilTypeId",
+      "value": "6"
+    },
+    {
+      "key": "sessionId",
+      "value": ""
+    }
+  ]
+}
