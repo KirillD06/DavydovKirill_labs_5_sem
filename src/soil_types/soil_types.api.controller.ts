@@ -36,17 +36,13 @@ export class SoilTypesApiController {
   }
 
   @Get('feed')
-  async feedFirst(): Promise<SoilTypeResponseDto> {
-    return this.toResponseOrNotFound(await this.soilTypesService.findFirst());
-  }
-
-  @Get('feed/:id')
   async feed(
-    @Param('id', ParseIntPipe) id: number,
+    @Query('id', new ParseIntPipe({ optional: true })) id?: number,
     @Query('next') next?: string,
   ): Promise<SoilTypeResponseDto> {
-    const soilType =
-      next === 'true'
+    const soilType = id === undefined
+      ? await this.soilTypesService.findFirst()
+      : next === 'true'
         ? await this.soilTypesService.findNext(id)
         : await this.soilTypesService.findById(id);
 
@@ -68,14 +64,14 @@ export class SoilTypesApiController {
   async create(
     @Body() dto: CreateSoilTypeDto,
     @UploadedFiles() files: { image?: Express.Multer.File[]; video?: Express.Multer.File[] },
-  ): Promise<SoilTypeResponseDto> {
+  ): Promise<{ id: number }> {
     const draft = await this.soilTypesService.createDraft(
       dto.name,
       files?.image?.[0],
       files?.video?.[0],
     );
 
-    return this.toResponse(draft);
+    return { id: draft.id };
   }
 
   @Put(':id/publish')

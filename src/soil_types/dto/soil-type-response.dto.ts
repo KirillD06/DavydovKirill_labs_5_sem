@@ -3,7 +3,7 @@ import { SoilType } from '../../entities/soil-type.entity';
 export class SoilTypeResponseDto {
   id: number;
   name: string;
-  description: string;
+  description: string | null;
   imageUrl: string | null;
   videoUrl: string | null;
   looseningFactor: number | null;

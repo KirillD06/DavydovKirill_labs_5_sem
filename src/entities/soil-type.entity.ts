@@ -12,8 +12,8 @@ export class SoilType {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ type: 'varchar', length: 1000, default: '' })
-  description: string;
+  @Column({ type: 'varchar', length: 1000, nullable: true })
+  description: string | null;
 
   @Column({ type: 'varchar', length: 20, default: 'draft' })
   status: SoilTypeStatus;
